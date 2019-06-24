@@ -1,0 +1,29 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: distributor
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: distributor
+    spec:
+      containers:
+      - name: distributor
+        image: quay.io/cortexproject/cortex:master-fe16b2bc
+        imagePullPolicy: IfNotPresent
+        args:
+        - -target=distributor
+        - -log.level=debug
+        - -server.http-listen-port=80
+        - -consul.hostname=consul.default.svc.cluster.local:8500
+        - -distributor.replication-factor=1
+        - -distributor.accept-ha-labels
+        - -distributor.accept-ha-samples
+        - -ha-tracker.cluster=cluster
+        - -ha-tracker.consul.hostname=consul:8500
+        - -ha-tracker.replica=replica
+        ports:
+        - containerPort: 80

@@ -1,0 +1,69 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ingester
+spec:
+  replicas: 5
+
+  # Ingesters are not ready for at least 1 min
+  # after creation.  This has to be in sync with
+  # the ring timeout value, as this will stop a
+  # stampede of new ingesters if we should loose
+  # some.
+  minReadySeconds: 60
+
+  # Having maxSurge 0 and maxUnavailable 1 means
+  # the deployment will update one ingester at a time
+  # as it will have to stop one (making one unavailable)
+  # before it can start one (surge of zero)
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+
+  template:
+    metadata:
+      labels:
+        name: ingester
+    spec:
+      # Give ingesters 40 minutes grace to flush chunks and exit cleanly.
+      # Service is available during this time, as long as we don't stop
+      # too many ingesters at once.
+      terminationGracePeriodSeconds: 2400
+
+      containers:
+      - name: ingester
+        image: quay.io/cortexproject/cortex:master-fe16b2bc
+        imagePullPolicy: IfNotPresent
+        args:
+        - -target=ingester
+        - -ingester.join-after=30s
+        - -ingester.claim-on-rollout=true
+        - -consul.hostname=consul.default.svc.cluster.local:8500
+        - -cassandra.addresses=cassie-cassandra.default.svc.cluster.local
+        - -cassandra.keyspace=cortex_new
+        - -cassandra.timeout=1000ms
+        - -cassandra.replication-factor=2
+        - -chunk.storage-client=cassandra
+        - -dynamodb.chunk-table.period=168h0m0s
+        - -dynamodb.chunk-table.prefix=cortex_chunks_
+        - -dynamodb.periodic-table.prefix=cortex_weekly_
+        - -dynamodb.periodic-table.from=2017-01-06
+        - -dynamodb.daily-buckets-from=2017-01-10
+        - -dynamodb.base64-buckets-from=2017-01-17
+        - -dynamodb.v4-schema-from=2017-02-05
+        - -dynamodb.v5-schema-from=2017-02-22
+        - -dynamodb.v6-schema-from=2017-03-19
+        - -dynamodb.chunk-table.from=2017-04-17
+        - -memcached.hostname=memcached.default.svc.cluster.local
+        - -memcached.timeout=100ms
+        - -memcached.service=memcached
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 15
+          timeoutSeconds: 1

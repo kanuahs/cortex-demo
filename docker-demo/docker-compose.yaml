@@ -1,0 +1,88 @@
+version: "3.7"
+services:
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - cortex_network
+    volumes:
+      - "./grafana-provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml"
+
+  prometheus1:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - cortex_network
+    volumes:
+      - "./prometheus-configs/prometheus1.yml:/etc/prometheus/prometheus.yml"
+
+  prometheus2:
+    image: prom/prometheus
+    networks:
+      - cortex_network
+    volumes:
+      - "./prometheus-configs/prometheus2.yml:/etc/prometheus/prometheus.yml"
+
+
+  prometheus3:
+    image: prom/prometheus
+    networks:
+      - cortex_network
+    volumes:
+      - "./prometheus-configs/prometheus3.yml:/etc/prometheus/prometheus.yml"
+
+  consul:
+    image: consul
+    restart: on-failure
+    networks:
+      - cortex_network
+
+
+  cortex1:
+    image: quay.io/cortexproject/cortex:master-fe16b2bc
+    restart: on-failure
+    networks:
+      - cortex_network
+    ports:
+      - "9009:9009"
+    volumes:
+      - "./cortex-configs/single-process-config.yaml:/etc/single-process-config.yaml"
+    command: [
+      "-config.file=/etc/single-process-config.yaml",
+      "-ring.store=consul",
+      "-consul.hostname=consul:8500",
+      "-distributor.replication-factor=3",
+      ]
+
+  cortex2:
+    image: quay.io/cortexproject/cortex:master-fe16b2bc
+    restart: on-failure
+    networks:
+      - cortex_network
+    volumes:
+      - "./cortex-configs/single-process-config.yaml:/etc/single-process-config.yaml"
+    command: [
+      "-config.file=/etc/single-process-config.yaml",
+      "-ring.store=consul",
+      "-consul.hostname=consul:8500",
+      "-distributor.replication-factor=3"
+      ]
+
+  cortex3:
+    image: quay.io/cortexproject/cortex:master-fe16b2bc
+    restart: on-failure
+    networks:
+      - cortex_network
+    volumes:
+      - "./cortex-configs/single-process-config.yaml:/etc/single-process-config.yaml"
+    command: [
+      "-config.file=/etc/single-process-config.yaml",
+      "-ring.store=consul",
+      "-consul.hostname=consul:8500",
+      "-distributor.replication-factor=3"
+      ]
+
+networks:
+  cortex_network:

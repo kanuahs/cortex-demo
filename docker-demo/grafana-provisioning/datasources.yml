@@ -1,0 +1,58 @@
+# This file provisions datasources when grafana is starting.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus1
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus1:9090
+    isDefault:
+    version: 1
+    editable: true
+
+  - name: Prometheus2
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus2:9090
+    isDefault:
+    version: 1
+    editable: true
+
+
+  - name: Prometheus3
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus3:9090
+    isDefault:
+    version: 1
+    editable: true
+
+  - name: Cortex1
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://cortex1:9009/api/prom
+    isDefault:
+    version: 1
+    editable: true
+
+  - name: Cortex2
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://cortex2:9009/api/prom
+    isDefault:
+    version: 1
+    editable: true
+
+  - name: Cortex3
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://cortex3:9009/api/prom
+    isDefault:
+    version: 1
+    editable: true
