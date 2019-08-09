@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: distributor
-        image: quay.io/cortexproject/cortex:master-fe16b2bc
+        image: quay.io/cortexproject/cortex:v0.1.0
         imagePullPolicy: IfNotPresent
         args:
         - -target=distributor
@@ -20,10 +20,10 @@ spec:
         - -server.http-listen-port=80
         - -consul.hostname=consul.default.svc.cluster.local:8500
         - -distributor.replication-factor=1
-        - -distributor.accept-ha-labels
-        - -distributor.accept-ha-samples
-        - -ha-tracker.cluster=cluster
-        - -ha-tracker.consul.hostname=consul:8500
-        - -ha-tracker.replica=replica
+        - -distributor.ha-tracker.enable
+        - -distributor.ha-tracker.enable-for-all-users
+        - -distributor.ha-tracker.cluster=cluster
+        - -distributor.ha-tracker.consul.hostname=consul:8500
+        - -distributor.ha-tracker.replica=replica
         ports:
         - containerPort: 80

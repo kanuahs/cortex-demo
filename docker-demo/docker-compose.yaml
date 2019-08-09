@@ -41,7 +41,7 @@ services:
 
 
   cortex1:
-    image: quay.io/cortexproject/cortex:master-fe16b2bc
+    image: quay.io/cortexproject/cortex:v0.1.0
     restart: on-failure
     networks:
       - cortex_network
@@ -57,7 +57,7 @@ services:
       ]
 
   cortex2:
-    image: quay.io/cortexproject/cortex:master-fe16b2bc
+    image: quay.io/cortexproject/cortex:v0.1.0
     restart: on-failure
     networks:
       - cortex_network
@@ -71,7 +71,7 @@ services:
       ]
 
   cortex3:
-    image: quay.io/cortexproject/cortex:master-fe16b2bc
+    image: quay.io/cortexproject/cortex:v0.1.0
     restart: on-failure
     networks:
       - cortex_network
